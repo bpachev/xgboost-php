@@ -3,10 +3,19 @@ XGBoost PHP Package
 
 Installation
 ------------
-- Start by cloning and building xgboost from source.
-- change directories to php-package/xgboost
+- Clone the repository ```git clone --recursive https://github.com/bpachev/xgboost-php```
+- Build XGBoost
+   ```
+   cd xgboost
+   make
+   ```
+- change directories to src
+   ```
+   cd ..
+   cd src
+   ```
 - At this point, the installation process is the same as when building any PHP extension from source.
-- If on Ubuntu, you can run ./easy_install.sh
+- If on Ubuntu, you can run ./easy_install.sh, which will install the extension and use phpenmod to enable it.
 - Otherwise, do the following:
   ```
   phpize
