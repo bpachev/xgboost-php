@@ -20,7 +20,7 @@ function find_mods_available_dir
 }
 
 export mods_available_dir=$(find_mods_available_dir $version)/mods-available
-echo "extension=${module_name}.so" | tee $mods_available_dir/$module_name.ini
+echo "extension=${module_name}.so" | sudo tee $mods_available_dir/$module_name.ini
 if [ "$version" = "5" ]; then
     php5enmod $module_name
 elif [ "$version" ]; then
