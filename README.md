@@ -1,5 +1,11 @@
-XGBoost PHP Package
+XGBoost PHP Wrapper
 ===================
+
+Abstract
+--------
+This is a PHP wrapper for [XGBoost](https://github.com/tqchen/xgboost), a popular and powerful machine learning library for gradient boosting. Currently, this wrapper only has support for making predictions using pre-trained models. The idea is that data scientists would build XGBoost models using Python, R or their favorite language for data analysis. Those models could then be easily used in PHP production environment.
+
+PHP isn't a popular language for data science. Consequently, this wrapper doesn't currently have the capability to build models. However, such capability could easily be added if there is demand for it. 
 
 Installation
 ------------
@@ -43,6 +49,7 @@ print "Number of rows: ".$dmat->getNumRow()."\n";
 
 $bst = new XGBooster();
 #Load a saved model file
+#example.model would be a binary XGBoost model file
 $bst->loadModel("example.model");
 #$preds will be a PHP array with three entries corresponding to the three rows in $dmat
 $preds = $bst->predict($dmat);
