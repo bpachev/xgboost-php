@@ -31,7 +31,7 @@ Examples
 
 A basic example of how to create a DMatrix, load a model, and get predictions.
 
-```
+```php
 <?php
 #Create a 2-D PHP array with some data.
 #We can pass in mixed types and it will all be converted to float
