@@ -1,0 +1,1 @@
+{"expected_predictions": [0.5], "input_rows": [[0.08748605705514989, 0.6467193130937224]], "model_filename": "tests/test_gbtree_1_2.model"}
