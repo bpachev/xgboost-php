@@ -1,0 +1,1 @@
+{"expected_predictions": [0.4996047019958496], "input_rows": [[0.7952656852019718, 0.7105303951854299]], "model_filename": "tests/test_gblinear_1_2.model"}
