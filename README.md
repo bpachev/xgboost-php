@@ -99,5 +99,6 @@ $preds = $bst->predict($dmat);
 Running Tests
 -------------
 Simply run 
-```php tests/tests.php
+```
+php tests/tests.php
 ```
