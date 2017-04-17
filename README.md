@@ -32,6 +32,46 @@ Installation
 - Then, you'll need to enable your extension by adding the line extension=xgboost.so to php.ini.
 - See [this tutorial](https://www.sitepoint.com/install-php-extensions-source/) for further reading on installing PHP extensions.
 
+Documentation
+-------------
+This extension adds two classes to PHP: XGDMatrix, which wraps the native XGBoost DMatrix, and XGBooster, which wraps XGBoost's Booster.
+
+### XGDMatrix
+```php
+$matrix = new XGDMatrix($data, $numColumns);
+```
+where 
+```
+$data - a PHP array of arrays. Each sub-array must contain only numeric elements.
+$numColumns -- the expected number of columns in the DMatrix.
+   Even if some sub-arrays contain more than $numColumns columns,
+   only the first $numColumns entries will be read.
+```
+
+with methods
+```php
+#Return the integer number of columns in the underlying DMatrix
+$matrix->getNumCol();
+
+#Return the integer number of rows in the underlying DMatrix
+$matrix->getNumCol();
+```
+
+### XGBooster
+```php
+$booster = new XGBooster();
+```
+with methods
+```php
+#Load a prebuilt XGBoost model from the file named $filename
+$booster->loadModel($filename);
+
+#If a model has been loaded, we can use it to make predictions
+#$matrix must be an XGDMatrix.
+#$preds will be an array of predictions with length equal to the number of rows in $matrix
+$preds = $booster->predict($matrix)
+```
+
 Examples
 --------
 
@@ -54,4 +94,11 @@ $bst->loadModel("example.model");
 #$preds will be a PHP array with three entries corresponding to the three rows in $dmat
 $preds = $bst->predict($dmat);
 ?>
+```
+
+Running Tests
+-------------
+Simply run 
+```
+php tests/tests.php
 ```
