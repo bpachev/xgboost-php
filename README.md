@@ -68,8 +68,10 @@ $booster->loadModel($filename);
 
 #If a model has been loaded, we can use it to make predictions
 #$matrix must be an XGDMatrix.
+#$num_tree_limit is an optional second parameter. If set to 0, all trees are used.
+#If a positive integer, only the first $num_tree_limit trees are used to make predictions.
 #$preds will be an array of predictions with length equal to the number of rows in $matrix
-$preds = $booster->predict($matrix)
+$preds = $booster->predict($matrix, $num_tree_limit=0)
 ```
 
 Examples
@@ -95,6 +97,9 @@ $bst->loadModel("example.model");
 $preds = $bst->predict($dmat);
 ?>
 ```
+
+For a more realistic demo, see 
+[Titanic demo](https://github.com/bpachev/xgboost-php/blob/master/demo/titanic_demo.php)
 
 Running Tests
 -------------
