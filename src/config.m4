@@ -60,8 +60,8 @@ if test "$PHP_XGBOOST" != "no"; then
   dnl ])
   dnl
   XGBOOST_SOURCE_DIR=../xgboost
+  XGBOOST_INSTALL_DIR=$XGBOOST_SOURCE_DIR/lib
   if test -z "$XGBOOST_INSTALL_DIR"; then
-    XGBOOST_INSTALL_DIR=../$XGBOOST_SOURCE_DIR/lib
     AC_MSG_ERROR($XGBOOST_SOURCE_DIR)
   fi
   PHP_ADD_INCLUDE($XGBOOST_SOURCE_DIR/include)
