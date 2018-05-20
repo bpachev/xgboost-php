@@ -35,7 +35,7 @@ const zend_function_entry xgboost_functions[] = {
 /* }}} */
 
  zend_function_entry dmatrix_methods[] = {
- 	PHP_ME(DMatrix, __construct, NULL, ZEND_ACC_PUBLIC)
+ 	PHP_ME(DMatrix, __construct, NULL, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
  	PHP_ME(DMatrix, getNumRow, NULL, ZEND_ACC_PUBLIC)
  	PHP_ME(DMatrix, getNumCol, NULL, ZEND_ACC_PUBLIC)
 	PHP_FE_END
@@ -55,7 +55,9 @@ struct dmatrix_object
 
 zend_function_entry booster_methods[] = {
 	PHP_ME(Booster, __construct, NULL,  ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
- 	PHP_ME(Booster, loadModel, NULL, ZEND_ACC_PUBLIC)
+ 	PHP_ME(Booster, getAttr, NULL, ZEND_ACC_PUBLIC)
+  	PHP_ME(Booster, setAttr, NULL, ZEND_ACC_PUBLIC)
+   	PHP_ME(Booster, loadModel, NULL, ZEND_ACC_PUBLIC)
  	PHP_ME(Booster, predict, NULL, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
@@ -376,6 +378,55 @@ PHP_METHOD(Booster, __construct)
 	}
 
 	RETURN_TRUE;
+}
+/* }}} */
+
+/* {{{ proto Booster string getAttr(string attrname)
+   Return the attribute value of Booster
+   */
+PHP_METHOD(Booster, getAttr)
+{
+	zend_string *attrname;
+	int success = 0;
+	const char *result;
+
+	#undef IS_UNDEF
+	#define IS_UNDEF Z_EXPECTED_LONG
+	ZEND_PARSE_PARAMETERS_START(1, 1)
+		Z_PARAM_STR(attrname)
+	ZEND_PARSE_PARAMETERS_END();
+	#undef IS_UNDEF
+	#define IS_UNDEF 0
+
+	booster_object * obj = XG_GET_THIS(booster_object);
+	if (check_xgboost_call(XGBoosterGetAttr(obj->handle, ZSTR_VAL(attrname), &result, &success)) && success) {
+		RETURN_STR(zend_string_init(result, strlen(result), 0));
+	}
+	else RETURN_NULL();
+}
+/* }}} */
+
+/* {{{ proto Booster bool setAttr(string attrname, string value)
+   Set the attribute value of Booster
+   */
+PHP_METHOD(Booster, setAttr)
+{
+	zend_string *attrname, *value;
+
+	#undef IS_UNDEF
+	#define IS_UNDEF Z_EXPECTED_LONG
+	ZEND_PARSE_PARAMETERS_START(2, 2)
+		Z_PARAM_STR(attrname)
+		Z_PARAM_STR(value)
+	ZEND_PARSE_PARAMETERS_END();
+	#undef IS_UNDEF
+	#define IS_UNDEF 0
+
+	booster_object * obj = XG_GET_THIS(booster_object);
+	if (check_xgboost_call(XGBoosterSetAttr(obj->handle, ZSTR_VAL(attrname), ZSTR_VAL(value)))) {
+		RETURN_TRUE;
+	}
+	else RETURN_FALSE;
 }
 /* }}} */
 

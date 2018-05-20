@@ -33,6 +33,8 @@ PHP_METHOD(DMatrix, getNumRow);
 PHP_METHOD(DMatrix, getNumCol);
 
 PHP_METHOD(Booster, __construct);
+PHP_METHOD(Booster, getAttr);
+PHP_METHOD(Booster, setAttr);
 PHP_METHOD(Booster, loadModel);
 PHP_METHOD(Booster, predict);
 
