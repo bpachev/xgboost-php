@@ -25,7 +25,7 @@ Installation
 - Otherwise, do the following:
   ```
   phpize
-  ./configure --enable-xgboost
+  ./configure
   make
   sudo make install
   ```

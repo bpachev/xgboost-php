@@ -14,10 +14,7 @@ dnl [  --with-xgboost             Include xgboost support])
 dnl Otherwise use enable:
 
 PHP_ARG_ENABLE(xgboost, whether to enable xgboost support,
-[  --enable-xgboost           Enable xgboost support])
-
-PHP_ARG_ENABLE(xgboost-debug, whether to enable debugging support in xgboost,
-[  --enable-xgboost-debug        xgboost: Enable debugging support in xgboost], yes, yes)
+[  --enable-xgboost           Enable xgboost support], no, yes)
 
 if test "$PHP_XGBOOST" != "no"; then
   dnl Write more examples of tests here...

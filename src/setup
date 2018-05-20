@@ -2,10 +2,10 @@
 if [ "$1" ]; then
 	echo "configuring for PHP ${1}"
 	phpize$1;
-	./configure --enable-xgboost --enable-xgboost-debug --with-php-config=/usr/bin/php-config$1
+	./configure --with-php-config=/usr/bin/php-config$1
 else
     echo "configuring for the default installation of php"
     phpize
-    ./configure --enable-xgboost --enable-xgboost-debug
+    ./configure
 fi
 
