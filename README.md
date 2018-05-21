@@ -98,6 +98,26 @@ $preds = $bst->predict($dmat);
 ?>
 ```
 
+Another very useful feature is model attributes. You can store some extra information in model file before exporting model then get that data back after model loading:
+
+```
+# Python code ...
+model = xgb.train(params, matrix)
+model.set_attr(my_data='model ver 1.0')
+
+#Save a model for PHP to use
+model.save_model("titanic.model")
+```
+
+```
+# Then in PHP...
+$bst = new XGBooster();
+#Load a saved model file
+#example.model would be a binary XGBoost model file
+$bst->loadModel("example.model");
+print $bsd->getAttr('my_data');
+```
+
 For a more realistic demo, see 
 [Titanic demo](https://github.com/bpachev/xgboost-php/blob/master/demo/titanic_demo.php)
 

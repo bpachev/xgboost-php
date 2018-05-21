@@ -54,6 +54,7 @@ struct dmatrix_object
 };
 
 zend_function_entry booster_methods[] = {
+	PHP_ME(Booster, getLastError, NULL, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC|ZEND_ACC_FINAL)
 	PHP_ME(Booster, __construct, NULL,  ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
  	PHP_ME(Booster, getAttr, NULL, ZEND_ACC_PUBLIC)
   	PHP_ME(Booster, setAttr, NULL, ZEND_ACC_PUBLIC)
@@ -357,6 +358,20 @@ PHP_METHOD(DMatrix, getNumCol)
 
 }
 /* }}} */
+
+/* {{{ proto string Booster::getLastError()
+ * Returns XGB last error (XGBGetLastError in c_api.h) */
+PHP_METHOD(Booster, getLastError)
+{
+	if (zend_parse_parameters_none() == FAILURE) {
+		return;
+	}
+
+	const char *result = XGBGetLastError();
+
+	RETURN_STRINGL(result, sizeof(*result)-1);
+}
+/* }}}*/
 
 /* {{{ proto Booster contruct()
    Construct an xgboost Booster.
