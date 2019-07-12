@@ -280,9 +280,9 @@ PHP_METHOD(DMatrix, __construct)
 	zval* input_arr;
 	bst_ulong nrow;
 	bst_ulong ncol;
-	float missing = 0;
+	double missing = 0;
 
-	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "al", &input_arr, &ncol) == FAILURE) {
+	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "al|d", &input_arr, &ncol, &missing) == FAILURE) {
 		RETURN_NULL();
 	}
 
@@ -304,7 +304,7 @@ PHP_METHOD(DMatrix, __construct)
 
  			XG_FOREACH_VAL(Z_ARRVAL_P(entry), row_entry) {
 
-				register float el = missing;
+				register float el = (float)missing;
 				XG_EXTRACT_DVAL_P(row_entry, el);
 				row_buf[col] = el;
 				col++;
@@ -318,7 +318,7 @@ PHP_METHOD(DMatrix, __construct)
 	} XG_FOREACH_END();
 
 	dmatrix_object * obj = XG_GET_THIS(dmatrix_object);
-	if (!check_xgboost_call(XGDMatrixCreateFromMat(data, nrow, ncol, missing, &(obj->handle)))) {
+	if (!check_xgboost_call(XGDMatrixCreateFromMat(data, nrow, ncol, (float)missing, &(obj->handle)))) {
 		RETURN_NULL();
 	}
 
