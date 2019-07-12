@@ -35,7 +35,7 @@ const zend_function_entry xgboost_functions[] = {
 /* }}} */
 
  zend_function_entry dmatrix_methods[] = {
- 	PHP_ME(DMatrix, __construct, NULL, ZEND_ACC_PUBLIC)
+ 	PHP_ME(DMatrix, __construct, NULL, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
  	PHP_ME(DMatrix, getNumRow, NULL, ZEND_ACC_PUBLIC)
  	PHP_ME(DMatrix, getNumCol, NULL, ZEND_ACC_PUBLIC)
 	PHP_FE_END
@@ -54,8 +54,11 @@ struct dmatrix_object
 };
 
 zend_function_entry booster_methods[] = {
+	PHP_ME(Booster, getLastError, NULL, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC|ZEND_ACC_FINAL)
 	PHP_ME(Booster, __construct, NULL,  ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
- 	PHP_ME(Booster, loadModel, NULL, ZEND_ACC_PUBLIC)
+ 	PHP_ME(Booster, getAttr, NULL, ZEND_ACC_PUBLIC)
+  	PHP_ME(Booster, setAttr, NULL, ZEND_ACC_PUBLIC)
+   	PHP_ME(Booster, loadModel, NULL, ZEND_ACC_PUBLIC)
  	PHP_ME(Booster, predict, NULL, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
@@ -81,9 +84,9 @@ zend_module_entry xgboost_module_entry = {
 	"xgboost",
 	xgboost_functions,
 	PHP_MINIT(xgboost),
-	PHP_MSHUTDOWN(xgboost),
-	PHP_RINIT(xgboost),		/* Replace with NULL if there's nothing to do at request start */
-	PHP_RSHUTDOWN(xgboost),	/* Replace with NULL if there's nothing to do at request end */
+	NULL,/*PHP_MSHUTDOWN(xgboost),*/
+	NULL,/*PHP_RINIT(xgboost),*/		/* Replace with NULL if there's nothing to do at request start */
+	NULL,/*PHP_RSHUTDOWN(xgboost),*/	/* Replace with NULL if there's nothing to do at request end */
 	PHP_MINFO(xgboost),
 #if ZEND_MODULE_API_NO >= 20010901
 	PHP_XGBOOST_VERSION,
@@ -117,10 +120,9 @@ static void php_xgboost_init_globals(zend_xgboost_globals *xgboost_globals)
 */
 /* }}} */
 
-bool check_xgboost_call(int return_val)
+inline bool check_xgboost_call(int return_val)
 {
-	if (!return_val) return true;
-	else return false;
+	return !return_val;
 }
 
 void dmatrix_free_storage(XG_OBJ_FREE_STORAGE_ARG_TYPE object TSRMLS_DC)
@@ -201,32 +203,28 @@ PHP_MINIT_FUNCTION(xgboost)
 /* }}} */
 
 /* {{{ PHP_MSHUTDOWN_FUNCTION
- */
 PHP_MSHUTDOWN_FUNCTION(xgboost)
 {
-	/* uncomment this line if you have INI entries
-	UNREGISTER_INI_ENTRIES();
-	*/
+	// uncomment next line if you have INI entries
+	//UNREGISTER_INI_ENTRIES();
 	return SUCCESS;
-}
+} */
 /* }}} */
 
 /* Remove if there's nothing to do at request start */
 /* {{{ PHP_RINIT_FUNCTION
- */
 PHP_RINIT_FUNCTION(xgboost)
 {
 	return SUCCESS;
-}
+} */
 /* }}} */
 
 /* Remove if there's nothing to do at request end */
 /* {{{ PHP_RSHUTDOWN_FUNCTION
- */
 PHP_RSHUTDOWN_FUNCTION(xgboost)
 {
 	return SUCCESS;
-}
+} */
 /* }}} */
 
 /* {{{ PHP_MINFO_FUNCTION
@@ -361,6 +359,20 @@ PHP_METHOD(DMatrix, getNumCol)
 }
 /* }}} */
 
+/* {{{ proto string Booster::getLastError()
+ * Returns XGB last error (XGBGetLastError in c_api.h) */
+PHP_METHOD(Booster, getLastError)
+{
+	if (zend_parse_parameters_none() == FAILURE) {
+		return;
+	}
+
+	const char *result = XGBGetLastError();
+
+	RETURN_STRINGL(result, sizeof(*result)-1);
+}
+/* }}}*/
+
 /* {{{ proto Booster contruct()
    Construct an xgboost Booster.
    */
@@ -384,25 +396,78 @@ PHP_METHOD(Booster, __construct)
 }
 /* }}} */
 
+/* {{{ proto Booster string getAttr(string attrname)
+   Return the attribute value of Booster
+   */
+PHP_METHOD(Booster, getAttr)
+{
+	zend_string *attrname;
+	int success = 0;
+	const char *result;
+
+	#undef IS_UNDEF
+	#define IS_UNDEF Z_EXPECTED_LONG
+	ZEND_PARSE_PARAMETERS_START(1, 1)
+		Z_PARAM_STR(attrname)
+	ZEND_PARSE_PARAMETERS_END();
+	#undef IS_UNDEF
+	#define IS_UNDEF 0
+
+	booster_object * obj = XG_GET_THIS(booster_object);
+	if (check_xgboost_call(XGBoosterGetAttr(obj->handle, ZSTR_VAL(attrname), &result, &success)) && success) {
+		RETURN_STR(zend_string_init(result, strlen(result), 0));
+	}
+	else RETURN_NULL();
+}
+/* }}} */
+
+/* {{{ proto Booster bool setAttr(string attrname, string value)
+   Set the attribute value of Booster
+   */
+PHP_METHOD(Booster, setAttr)
+{
+	zend_string *attrname, *value;
+
+	#undef IS_UNDEF
+	#define IS_UNDEF Z_EXPECTED_LONG
+	ZEND_PARSE_PARAMETERS_START(2, 2)
+		Z_PARAM_STR(attrname)
+		Z_PARAM_STR(value)
+	ZEND_PARSE_PARAMETERS_END();
+	#undef IS_UNDEF
+	#define IS_UNDEF 0
+
+	booster_object * obj = XG_GET_THIS(booster_object);
+	if (check_xgboost_call(XGBoosterSetAttr(obj->handle, ZSTR_VAL(attrname), ZSTR_VAL(value)))) {
+		RETURN_TRUE;
+	}
+	else RETURN_FALSE;
+}
+/* }}} */
+
 /* {{{ proto Booster loadModel(string filename)
    Construct an xgboost Booster.
    */
 PHP_METHOD(Booster, loadModel)
 {
-	char * fname;
-	size_t name_len=0;
+	char *filename;
+	size_t filename_len;
 
-	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &fname, &name_len) == FAILURE) {
+	//https://cismon.net/2017/12/18/Fast-ZPP-s-Incompatibility-with-CPP/
+	#undef IS_UNDEF
+	#define IS_UNDEF Z_EXPECTED_LONG // Which is zero
+	ZEND_PARSE_PARAMETERS_START(1, 1)
+		Z_PARAM_PATH(filename, filename_len)
+	ZEND_PARSE_PARAMETERS_END_EX(RETURN_NULL());
+	#undef IS_UNDEF
+	#define IS_UNDEF 0
+
+	if (php_check_open_basedir(filename)) {
 		RETURN_NULL();
 	}
 
-	//Create a zero-terminated string.
-	char buf[name_len+1];
-	memcpy(buf, fname, name_len);
-	buf[name_len] = 0;
-
 	booster_object * obj = XG_GET_THIS(booster_object);
-	if (!check_xgboost_call(XGBoosterLoadModel(obj->handle, buf))) {
+	if (!check_xgboost_call(XGBoosterLoadModel(obj->handle, filename))) {
 		RETURN_FALSE;
 	}
 

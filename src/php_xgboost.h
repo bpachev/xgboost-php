@@ -5,7 +5,7 @@
 extern zend_module_entry xgboost_module_entry;
 #define phpext_xgboost_ptr &xgboost_module_entry
 
-#define PHP_XGBOOST_VERSION "0.1.0" /* Replace with version number for your extension */
+#define PHP_XGBOOST_VERSION "0.2.0" /* Replace with version number for your extension */
 
 #ifdef PHP_WIN32
 #	define PHP_XGBOOST_API __declspec(dllexport)
@@ -32,7 +32,10 @@ PHP_METHOD(DMatrix, __construct);
 PHP_METHOD(DMatrix, getNumRow);
 PHP_METHOD(DMatrix, getNumCol);
 
+PHP_METHOD(Booster, getLastError);
 PHP_METHOD(Booster, __construct);
+PHP_METHOD(Booster, getAttr);
+PHP_METHOD(Booster, setAttr);
 PHP_METHOD(Booster, loadModel);
 PHP_METHOD(Booster, predict);
 

@@ -25,7 +25,7 @@ Installation
 - Otherwise, do the following:
   ```
   phpize
-  ./configure --enable-xgboost
+  ./configure
   make
   sudo make install
   ```
@@ -72,6 +72,15 @@ $booster->loadModel($filename);
 #If a positive integer, only the first $num_tree_limit trees are used to make predictions.
 #$preds will be an array of predictions with length equal to the number of rows in $matrix
 $preds = $booster->predict($matrix, $num_tree_limit=0)
+
+#Get model attribute 'my_data'
+print($booster->getAttr('my_data'));
+
+#Set model attribute 'my_data' to 'my_value'
+$booster->setAttr('my_data', 'my_value');
+
+#Get XGB last error
+print(XGBooster::getLastError());
 ```
 
 Examples
@@ -96,6 +105,26 @@ $bst->loadModel("example.model");
 #$preds will be a PHP array with three entries corresponding to the three rows in $dmat
 $preds = $bst->predict($dmat);
 ?>
+```
+
+Another very useful feature is model attributes. You can store some extra information in model file before exporting model then get that data back after model loading:
+
+```
+# Python code ...
+model = xgb.train(params, matrix)
+model.set_attr(my_data='model ver 1.0')
+
+#Save a model for PHP to use
+model.save_model("titanic.model")
+```
+
+```
+# Then in PHP...
+$bst = new XGBooster();
+#Load a saved model file
+#example.model would be a binary XGBoost model file
+$bst->loadModel("example.model");
+print $bst->getAttr('my_data');
 ```
 
 For a more realistic demo, see 
