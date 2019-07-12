@@ -31,6 +31,7 @@ Installation
   ```
 - Then, you'll need to enable your extension by adding the line extension=xgboost.so to php.ini.
 - See [this tutorial](https://www.sitepoint.com/install-php-extensions-source/) for further reading on installing PHP extensions.
+- On Ubuntu, if phpize is not installed, you can install it and other PHP development tools by sudo apt install php-dev. 
 
 Documentation
 -------------
