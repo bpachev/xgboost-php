@@ -39,14 +39,16 @@ This extension adds two classes to PHP: XGDMatrix, which wraps the native XGBoos
 
 ### XGDMatrix
 ```php
-$matrix = new XGDMatrix($data, $numColumns);
+$matrix = new XGDMatrix($data, $numColumns, $missing=null);
 ```
 where 
 ```
-$data - a PHP array of arrays. Each sub-array must contain only numeric elements.
+$data - a PHP array of arrays. Each sub-array should contain only numeric elements or nulls.
+  If strings are provided, they will be converted to floats.
 $numColumns -- the expected number of columns in the DMatrix.
    Even if some sub-arrays contain more than $numColumns columns,
    only the first $numColumns entries will be read.
+$missing -- the value to interpret as missing. If provided, must be a float. Regardless of the value of $missing, null is always interpreted as missing.
 ```
 
 with methods
@@ -82,6 +84,10 @@ $booster->setAttr('my_data', 'my_value');
 
 #Get XGB last error
 print(XGBooster::getLastError());
+
+#Set the number of threads to use for prediction (for a full list of parameters, check out the XGBoost documentation)
+#Unlike setAttr, parameters have an effect on the behavior of the booster.
+$booster->setParam("nthread", 1);
 ```
 
 Examples
@@ -130,6 +136,9 @@ print $bst->getAttr('my_data');
 
 For a more realistic demo, see 
 [Titanic demo](https://github.com/bpachev/xgboost-php/blob/master/demo/titanic_demo.php)
+
+For an example of how to control the number of threads used in prediction, see
+[Benchmark](https://github.com/bpachev/xgboost-php/blob/master/demo/benchmark.php)
 
 Running Tests
 -------------
