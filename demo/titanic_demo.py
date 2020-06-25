@@ -11,8 +11,7 @@ labels = array(df["Survived"])
 #Dummy code the Sex column
 df["Sex_is_female"] = df["Sex"] == "female"
 
-missing_val = -999
-matrix = xgb.DMatrix(df[["Sex_is_female", "Age", "Fare"]].fillna(-999), label=labels, missing=missing_val)
+matrix = xgb.DMatrix(df[["Sex_is_female", "Age", "Fare"]], label=labels)
 
 params = {"max_depth":3, "num_rounds":10, "objective":"binary:logistic"}
 model = xgb.train(params, matrix)

@@ -16,6 +16,11 @@
  */
 #include <stdint.h>
 #include "xgboost/c_api.h"
+#include <cmath>
+#include <limits>
+#include <stdlib.h>
+
+using namespace std;
 
 /* If you declare any globals in php_xgboost.h uncomment this:
 ZEND_DECLARE_MODULE_GLOBALS(xgboost)
@@ -149,30 +154,6 @@ void booster_free_storage(XG_OBJ_FREE_STORAGE_ARG_TYPE object TSRMLS_DC)
 	efree(d_obj);
 #endif
 }
-// void booster_free_storage(void * object TSRMLS_DC)
-// {
-// //	booster_object * d_obj = XG_OBJ_FREE_GET_CUST_STRUCT_P(booster_object, object);;
-// 	booster_object * d_obj = (booster_object*) object;
-// 	zend_object_std_dtor(&(d_obj->std));
-// 	XGBoosterFree(d_obj->handle);
-// 	efree(d_obj);
-// }
-
-// zend_object_value booster_create_handler(zend_class_entry *type TSRMLS_DC)
-// {
-// 	zend_object_value retval;
-//
-// 	booster_object *obj = (booster_object *)emalloc(sizeof(booster_object));
-// 	memset(obj, 0, sizeof(booster_object));
-// 	obj->std.ce = type;
-// 	object_properties_init(&obj->std, type);
-//
-// 	retval.handle = zend_objects_store_put(obj, NULL,
-// 	booster_free_storage, NULL TSRMLS_CC);
-// 	retval.handlers = &booster_object_handlers;
-//
-// 	return retval;
-// }
 
 XG_DEFAULT_CREATE_OBJECT_HANDLER(booster_object, booster_create_handler, booster_object_handlers, booster_free_storage)
 
@@ -280,11 +261,13 @@ PHP_METHOD(DMatrix, __construct)
 	zval* input_arr;
 	bst_ulong nrow;
 	bst_ulong ncol;
-	double missing = 0;
+	double missing = NAN;
 
 	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "al|d", &input_arr, &ncol, &missing) == FAILURE) {
 		RETURN_NULL();
 	}
+
+	float float_missing = (isnan(missing)) ? std::numeric_limits<float>::quiet_NaN() : (float)missing;
 
 	nrow = (bst_ulong)zend_hash_num_elements(Z_ARRVAL_P(input_arr));
 
@@ -304,8 +287,10 @@ PHP_METHOD(DMatrix, __construct)
 
  			XG_FOREACH_VAL(Z_ARRVAL_P(entry), row_entry) {
 
-				register float el = (float)missing;
-				XG_EXTRACT_DVAL_P(row_entry, el);
+				register float el = float_missing;
+				if (Z_TYPE_P(row_entry) != IS_NULL) {
+					XG_EXTRACT_DVAL_P(row_entry, el);
+				}
 				row_buf[col] = el;
 				col++;
 				if (col >= ncol) break;
@@ -318,7 +303,7 @@ PHP_METHOD(DMatrix, __construct)
 	} XG_FOREACH_END();
 
 	dmatrix_object * obj = XG_GET_THIS(dmatrix_object);
-	if (!check_xgboost_call(XGDMatrixCreateFromMat(data, nrow, ncol, (float)missing, &(obj->handle)))) {
+	if (!check_xgboost_call(XGDMatrixCreateFromMat(data, nrow, ncol, float_missing, &(obj->handle)))) {
 		RETURN_NULL();
 	}
 
@@ -378,12 +363,6 @@ PHP_METHOD(Booster, getLastError)
    */
 PHP_METHOD(Booster, __construct)
 {
-//	zval * arg;
-// 	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "z", &arg) == FAILURE) {
-// 		RETURN_NULL();
-// 	}
-// 	php_printf("Called constructor\n");
-
 	booster_object * obj = XG_GET_THIS(booster_object);
 	bst_ulong num_dmats = 0;
 	DMatrixHandle dmats[0];
@@ -489,7 +468,6 @@ PHP_METHOD(Booster, predict)
 
 	booster_object * bst = XG_GET_THIS(booster_object);
 	dmatrix_object * dmat = XG_ZVAL_P_TO_CUSTOM_STRUCT_P(dmatrix_object, dmatrix_zval);
-//	php_printf("dmat address %ld\n", dmat);
 
  	bst_ulong res_len = 0;
  	const float * res_arr;

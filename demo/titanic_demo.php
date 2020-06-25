@@ -1,5 +1,4 @@
 <?php
-define('TITANIC_MISSING_VALUE', -999);
 define('TITANIC_NUM_FEATURE', 3);
 
 function accuracy_score($labels, $preds)
@@ -22,7 +21,9 @@ function bail($msg)
 
 function fix_null($v)
 {
-    return (is_null($v)) ? TITANIC_MISSING_VALUE : (float)$v;
+    #The default missing value for XGDMatrix is null, so we don't want to cast it to a float (which would make it zero).
+    #XGBoost has special handling for missing values
+    return (is_null($v)) ? $v : (float)$v;
 }
 
 function read_titanic_data(&$data, &$labels, $filename=__DIR__."/titanic.csv")
@@ -31,13 +32,11 @@ function read_titanic_data(&$data, &$labels, $filename=__DIR__."/titanic.csv")
     {
         bail("Error opening titanic dataset in $filename.");
     }
-    
     #Read column names
     $column_names = fgetcsv($file);
     $names_to_inds = array_flip($column_names);
-    
+
     $data = [];
-    
     while (($row=fgetcsv($file)))
     {
         $is_female = ($row[$names_to_inds["Sex"]] == "female");

@@ -136,16 +136,19 @@ zend_object_value _create_handler_name(zend_class_entry * class_entry TSRMLS_DC)
 #define XG_OBJ_FREE_STORAGE_ARG_TYPE void *
 
 #define XG_EXTRACT_DVAL_P(zv, _res) do{\
-		switch (Z_TYPE_P(row_entry))\
+		switch (Z_TYPE_P(zv))\
 		{\
 			case IS_LONG:\
-				_res = (float)Z_LVAL_P(row_entry);\
+				_res = (float)Z_LVAL_P(zv);\
 				break;\
 			case IS_DOUBLE:\
-				_res = (float)Z_DVAL_P(row_entry);\
+				_res = (float)Z_DVAL_P(zv);\
 				break;\
 			case IS_BOOL:\
-				_res = (float)Z_BVAL_P(row_entry);\
+				_res = (float)Z_BVAL_P(zv);\
+				break;\
+			case IS_STRING:\
+				_res = atof(Z_STRVAL_P(zv));\
 				break;\
 			default:\
 				break;\

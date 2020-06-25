@@ -111,7 +111,8 @@ function run_test($test_json_filename)
 	$data = safe_json_read($test_json_filename);
 	validate_json_input($data);
 	$bst = new XGBooster();
-	$bst->loadModel($data["model_filename"]);
+	$model_filename = str_replace(".json",".model", $test_json_filename);
+	expect($bst->loadModel($model_filename), "Could not load model from $model_filename\n");
 
 	if (!count($data["input_rows"]))
 	{
@@ -121,17 +122,23 @@ function run_test($test_json_filename)
 
 	$num_cols = count($data["input_rows"][0]);
 	$mat = new XGDMatrix($data["input_rows"], $num_cols);
-
-	$missing_val = 0;
-	$preds = $bst->predict($mat, $missing_val);
+	$preds = $bst->predict($mat);
 	expect_arr_allclose($preds, $data["expected_predictions"]);
 }
 
-
-foreach (glob(__DIR__."/test*.json") as $test_case_filename)
-{
-	run_test($test_case_filename);
+if ($argc <= 1) {
+	foreach (glob(__DIR__."/test*.json") as $test_case_filename)
+	{
+		run_test($test_case_filename);
+	}
+	echo "All tests pass.\n";
 }
-echo "All tests pass.\n";
-
+else {
+	for ($i=1; $i < $argc; $i++)
+	{
+		$testname = $argv[$i];
+		run_test(__DIR__."/test_$testname.json");
+	}
+	echo "Tests pass.\n";
+}
 ?>
