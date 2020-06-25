@@ -36,6 +36,7 @@ PHP_METHOD(Booster, getLastError);
 PHP_METHOD(Booster, __construct);
 PHP_METHOD(Booster, getAttr);
 PHP_METHOD(Booster, setAttr);
+PHP_METHOD(Booster, setParam);
 PHP_METHOD(Booster, loadModel);
 PHP_METHOD(Booster, predict);
 

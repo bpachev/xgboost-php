@@ -63,6 +63,7 @@ zend_function_entry booster_methods[] = {
 	PHP_ME(Booster, __construct, NULL,  ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
  	PHP_ME(Booster, getAttr, NULL, ZEND_ACC_PUBLIC)
   	PHP_ME(Booster, setAttr, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Booster, setParam, NULL, ZEND_ACC_PUBLIC)
    	PHP_ME(Booster, loadModel, NULL, ZEND_ACC_PUBLIC)
  	PHP_ME(Booster, predict, NULL, ZEND_ACC_PUBLIC)
 	PHP_FE_END
@@ -418,6 +419,30 @@ PHP_METHOD(Booster, setAttr)
 
 	booster_object * obj = XG_GET_THIS(booster_object);
 	if (check_xgboost_call(XGBoosterSetAttr(obj->handle, ZSTR_VAL(attrname), ZSTR_VAL(value)))) {
+		RETURN_TRUE;
+	}
+	else RETURN_FALSE;
+}
+/* }}} */
+
+/* {{{ proto Booster bool setParam(string paramname, string value)
+   Set a parameter value of the booster (such as nthread). This will affect the behavior of the booster.
+   */
+PHP_METHOD(Booster, setParam)
+{
+	zend_string *paramname, *value;
+
+	#undef IS_UNDEF
+	#define IS_UNDEF Z_EXPECTED_LONG
+	ZEND_PARSE_PARAMETERS_START(2, 2)
+		Z_PARAM_STR(paramname)
+		Z_PARAM_STR(value)
+	ZEND_PARSE_PARAMETERS_END();
+	#undef IS_UNDEF
+	#define IS_UNDEF 0
+
+	booster_object * obj = XG_GET_THIS(booster_object);
+	if (check_xgboost_call(XGBoosterSetParam(obj->handle, ZSTR_VAL(paramname), ZSTR_VAL(value)))) {
 		RETURN_TRUE;
 	}
 	else RETURN_FALSE;
