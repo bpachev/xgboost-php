@@ -495,11 +495,13 @@ PHP_METHOD(Booster, predict)
 	dmatrix_object * dmat = XG_ZVAL_P_TO_CUSTOM_STRUCT_P(dmatrix_object, dmatrix_zval);
 
  	bst_ulong res_len = 0;
+	//Not in training mode
+	int training = 0;
  	const float * res_arr;
  	int option_mask = 0; //The default
- 	if (!check_xgboost_call(XGBoosterPredict(bst->handle, dmat->handle, option_mask, ntree_limit, &res_len, &res_arr))) {
- 		RETURN_NULL();
- 	}
+	if (!check_xgboost_call(XGBoosterPredict(bst->handle, dmat->handle, option_mask, ntree_limit, training, &res_len, &res_arr))) {
+		RETURN_NULL();
+	}
 
 	array_init(return_value);
 	for (bst_ulong i=0; i < res_len; i++) {

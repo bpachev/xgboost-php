@@ -13,11 +13,11 @@ df["Sex_is_female"] = df["Sex"] == "female"
 
 matrix = xgb.DMatrix(df[["Sex_is_female", "Age", "Fare"]], label=labels)
 
-params = {"max_depth":3, "num_rounds":10, "objective":"binary:logistic"}
+params = {"max_depth":3, "objective":"binary:logistic"}
 model = xgb.train(params, matrix)
 
 preds = model.predict(matrix)
 pred_labels = preds > .5
-print "Accuracy on train set {:.4f}%".format(100*mean(pred_labels==labels))
+print("Accuracy on train set {:.4f}%".format(100*mean(pred_labels==labels)))
 #Save a model for PHP to use
 model.save_model("titanic.model")
