@@ -131,7 +131,7 @@ inline bool check_xgboost_call(int return_val)
 	return !return_val;
 }
 
-void dmatrix_free_storage(XG_OBJ_FREE_STORAGE_ARG_TYPE object TSRMLS_DC)
+void dmatrix_free_storage(XG_OBJ_FREE_STORAGE_ARG_TYPE object)
 {
 	dmatrix_object * d_obj = XG_OBJ_FREE_GET_CUST_STRUCT_P(dmatrix_object, object);
 	XGDMatrixFree(d_obj->handle);
@@ -145,7 +145,7 @@ void dmatrix_free_storage(XG_OBJ_FREE_STORAGE_ARG_TYPE object TSRMLS_DC)
 //Defines the create handler
 XG_DEFAULT_CREATE_OBJECT_HANDLER(dmatrix_object, dmatrix_create_handler, dmatrix_object_handlers, dmatrix_free_storage)
 
-void booster_free_storage(XG_OBJ_FREE_STORAGE_ARG_TYPE object TSRMLS_DC)
+void booster_free_storage(XG_OBJ_FREE_STORAGE_ARG_TYPE object)
 {
 	booster_object * d_obj = XG_OBJ_FREE_GET_CUST_STRUCT_P(booster_object, object);
 	XGBoosterFree(d_obj->handle);
@@ -167,7 +167,7 @@ PHP_MINIT_FUNCTION(xgboost)
 	*/
 	zend_class_entry ce;
 	INIT_CLASS_ENTRY(ce, "XGDMatrix", dmatrix_methods);
-	dmatrix_ce = zend_register_internal_class(&ce TSRMLS_CC);
+	dmatrix_ce = zend_register_internal_class(&ce);
 	dmatrix_ce->create_object = dmatrix_create_handler;
 	memcpy(&dmatrix_object_handlers,
 		zend_get_std_object_handlers(), sizeof(zend_object_handlers));
@@ -175,7 +175,7 @@ PHP_MINIT_FUNCTION(xgboost)
 
 	zend_class_entry booster_temp_ce;
 	INIT_CLASS_ENTRY(booster_temp_ce, "XGBooster", booster_methods);
-	booster_ce = zend_register_internal_class(&booster_temp_ce TSRMLS_CC);
+	booster_ce = zend_register_internal_class(&booster_temp_ce);
 	booster_ce->create_object = booster_create_handler;
 	memcpy(&booster_object_handlers,
         zend_get_std_object_handlers(), sizeof(zend_object_handlers));
@@ -237,7 +237,7 @@ PHP_MINFO_FUNCTION(xgboost)
 // 	int arg_len, len;
 // 	char *strg;
 //
-// 	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &arg, &arg_len) == FAILURE) {
+// 	if (zend_parse_parameters(ZEND_NUM_ARGS(), "s", &arg, &arg_len) == FAILURE) {
 // 		return;
 // 	}
 //
@@ -264,7 +264,7 @@ PHP_METHOD(DMatrix, __construct)
 	bst_ulong ncol;
 	double missing = NAN;
 
-	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "al|d", &input_arr, &ncol, &missing) == FAILURE) {
+	if (zend_parse_parameters(ZEND_NUM_ARGS(), "al|d", &input_arr, &ncol, &missing) == FAILURE) {
 		RETURN_NULL();
 	}
 
@@ -487,7 +487,7 @@ PHP_METHOD(Booster, predict)
 	zval * dmatrix_zval;
 	long ntree_limit = 0;
 
-	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "O|l", &dmatrix_zval, dmatrix_ce, &ntree_limit) == FAILURE) {
+	if (zend_parse_parameters(ZEND_NUM_ARGS(), "O|l", &dmatrix_zval, dmatrix_ce, &ntree_limit) == FAILURE) {
  		RETURN_NULL();
 	}
 
