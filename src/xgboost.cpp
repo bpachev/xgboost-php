@@ -39,12 +39,24 @@ const zend_function_entry xgboost_functions[] = {
 };
 /* }}} */
 
- zend_function_entry dmatrix_methods[] = {
- 	PHP_ME(DMatrix, __construct, NULL, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
- 	PHP_ME(DMatrix, getNumRow, NULL, ZEND_ACC_PUBLIC)
- 	PHP_ME(DMatrix, getNumCol, NULL, ZEND_ACC_PUBLIC)
+ZEND_BEGIN_ARG_INFO_EX(arginfo_dmatrix___construct, 0, 0, 2)
+	ZEND_ARG_INFO(0, input_arr)
+	ZEND_ARG_INFO(0, ncol)
+	ZEND_ARG_INFO(0, missing)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_dmatrix_getNumRow, 0, 0, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_dmatrix_getNumCol, 0, 0, 0)
+ZEND_END_ARG_INFO()
+
+zend_function_entry dmatrix_methods[] = {
+	PHP_ME(DMatrix, __construct, arginfo_dmatrix___construct, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
+	PHP_ME(DMatrix, getNumRow, arginfo_dmatrix_getNumRow, ZEND_ACC_PUBLIC)
+	PHP_ME(DMatrix, getNumCol, arginfo_dmatrix_getNumCol, ZEND_ACC_PUBLIC)
 	PHP_FE_END
- };
+};
 
 
 static zend_object_handlers dmatrix_object_handlers;
@@ -58,14 +70,43 @@ struct dmatrix_object
 	XG_CUST_OBJ_STRUCT_END()
 };
 
+ZEND_BEGIN_ARG_INFO_EX(arginfo_booster___construct, 0, 0, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_booster_loadModel, 0, 0, 1)
+	ZEND_ARG_INFO(0, filename)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_booster_predict, 0, 0, 1)
+	ZEND_ARG_INFO(0, dmatrix)
+	ZEND_ARG_INFO(0, ntree_limit)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_booster_setParam, 0, 0, 2)
+	ZEND_ARG_INFO(0, paramname)
+	ZEND_ARG_INFO(0, value)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_booster_setAttr, 0, 0, 2)
+	ZEND_ARG_INFO(0, attrname)
+	ZEND_ARG_INFO(0, value)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_booster_getAttr, 0, 0, 1)
+	ZEND_ARG_INFO(0, attrname)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_booster_getLastError, 0, 0, 0)
+ZEND_END_ARG_INFO()
+
 zend_function_entry booster_methods[] = {
-	PHP_ME(Booster, getLastError, NULL, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC|ZEND_ACC_FINAL)
-	PHP_ME(Booster, __construct, NULL,  ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
- 	PHP_ME(Booster, getAttr, NULL, ZEND_ACC_PUBLIC)
-  	PHP_ME(Booster, setAttr, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Booster, setParam, NULL, ZEND_ACC_PUBLIC)
-   	PHP_ME(Booster, loadModel, NULL, ZEND_ACC_PUBLIC)
- 	PHP_ME(Booster, predict, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Booster, __construct, arginfo_booster___construct,  ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
+	PHP_ME(Booster, getLastError, arginfo_booster_getLastError, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC|ZEND_ACC_FINAL)
+	PHP_ME(Booster, getAttr, arginfo_booster_getAttr, ZEND_ACC_PUBLIC)
+	PHP_ME(Booster, setAttr, arginfo_booster_setAttr, ZEND_ACC_PUBLIC)
+	PHP_ME(Booster, setParam, arginfo_booster_setParam, ZEND_ACC_PUBLIC)
+	PHP_ME(Booster, loadModel, arginfo_booster_loadModel, ZEND_ACC_PUBLIC)
+	PHP_ME(Booster, predict, arginfo_booster_predict, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
 
