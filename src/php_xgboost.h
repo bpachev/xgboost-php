@@ -19,6 +19,16 @@ extern zend_module_entry xgboost_module_entry;
 #include "TSRM.h"
 #endif
 
+#if PHP_MAJOR_VERSION >= 8
+  #ifndef TSRMLS_DC
+  #define TSRMLS_DC
+  #define TSRMLS_C
+  #define TSRMLS_CC
+  #define TSRMLS_FETCH()
+  #endif
+#endif
+
+
 PHP_MINIT_FUNCTION(xgboost);
 PHP_MSHUTDOWN_FUNCTION(xgboost);
 PHP_RINIT_FUNCTION(xgboost);
@@ -52,7 +62,9 @@ ZEND_END_MODULE_GLOBALS(xgboost)
 
 /* In every utility function you add that needs to use variables 
    in php_xgboost_globals, call TSRMLS_FETCH(); after declaring other 
-   variables used by that function. Always refer to
+   variables used by that function, or better yet, pass in TSRMLS_CC
+   after the last function argument and declare your utility function
+   with TSRMLS_DC after the last declared argument.  Always refer to
    the globals in your function as XGBOOST_G(variable).  You are 
    encouraged to rename these macros something shorter, see
    examples in any other php module directory.
@@ -81,10 +93,10 @@ ZEND_END_MODULE_GLOBALS(xgboost)
 #define XG_CREATE_HANDLER_INIT(cust_struct_name, _intern, class_entry)  _intern = (struct cust_struct_name *) ecalloc(1, XG_CUST_OBJ_SIZE(cust_struct_name, class_entry));
 
 #define XG_DEFAULT_CREATE_OBJECT_HANDLER(cust_struct_name, _create_handler_name, _cust_object_handlers, _cust_free_storage)\
-zend_object * _create_handler_name(zend_class_entry * class_entry)\
+zend_object * _create_handler_name(zend_class_entry * class_entry TSRMLS_DC)\
 {\
 	cust_struct_name *intern = (cust_struct_name *)ecalloc(1,sizeof(cust_struct_name) +zend_object_properties_size(class_entry));\
-         zend_object_std_init(&intern->std, class_entry);\
+         zend_object_std_init(&intern->std, class_entry TSRMLS_CC);\
          object_properties_init(&intern->std, class_entry);\
           _cust_object_handlers.offset = XtOffsetOf(struct cust_struct_name, std);\
          _cust_object_handlers.free_obj = _cust_free_storage;\
@@ -102,7 +114,7 @@ zend_object * _create_handler_name(zend_class_entry * class_entry)\
 
 #else
 #define XG_OBJ_FREE_GET_CUST_STRUCT_P(cust_struct_name, _obj) (cust_struct_name *) _obj
-#define XG_CUSTOM_STRUCT_P(cust_struct_name, obj) (cust_struct_name *) zend_object_store_get_object(obj)
+#define XG_CUSTOM_STRUCT_P(cust_struct_name, obj) (cust_struct_name *) zend_object_store_get_object(obj TSRMLS_CC)
 #define XG_ZVAL_P_TO_CUSTOM_STRUCT_P(cust_struct_name, _zv) XG_CUSTOM_STRUCT_P(cust_struct_name, _zv)
 #define XG_GET_THIS(cust_struct_name) XG_CUSTOM_STRUCT_P(cust_struct_name, getThis())
 //expects val to be zval*
@@ -119,7 +131,7 @@ zend_object * _create_handler_name(zend_class_entry * class_entry)\
 	} while(0)
 
 #define XG_DEFAULT_CREATE_OBJECT_HANDLER(cust_struct_name, _create_handler_name, _cust_object_handlers, _cust_free_storage)\
-zend_object_value _create_handler_name(zend_class_entry * class_entry)\
+zend_object_value _create_handler_name(zend_class_entry * class_entry TSRMLS_DC)\
 {\
 	zend_object_value retval;\
 	cust_struct_name *obj = (cust_struct_name *)emalloc(sizeof(cust_struct_name));\
@@ -127,7 +139,7 @@ zend_object_value _create_handler_name(zend_class_entry * class_entry)\
 	obj->std.ce = class_entry;\
 	object_properties_init(&obj->std, class_entry);\
 	retval.handle = zend_objects_store_put(obj, NULL,\
-	_cust_free_storage, NULL);\
+	_cust_free_storage, NULL TSRMLS_CC);\
 	retval.handlers = &_cust_object_handlers;\
 	return retval;\
 }
