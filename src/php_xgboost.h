@@ -19,6 +19,16 @@ extern zend_module_entry xgboost_module_entry;
 #include "TSRM.h"
 #endif
 
+#if PHP_MAJOR_VERSION >= 8
+  #ifndef TSRMLS_DC
+  #define TSRMLS_DC
+  #define TSRMLS_C
+  #define TSRMLS_CC
+  #define TSRMLS_FETCH()
+  #endif
+#endif
+
+
 PHP_MINIT_FUNCTION(xgboost);
 PHP_MSHUTDOWN_FUNCTION(xgboost);
 PHP_RINIT_FUNCTION(xgboost);
